@@ -3,20 +3,49 @@ package com.fff.registry.nacos;
 import com.alibaba.nacos.api.exception.NacosException;
 import com.alibaba.nacos.api.naming.NamingFactory;
 import com.alibaba.nacos.api.naming.NamingService;
+import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import com.fff.registry.ServiceRegistry;
 
 import java.net.InetSocketAddress;
+import java.util.Properties;
 
 @Slf4j
+@Data
 public class NacosServiceRegistry implements ServiceRegistry {
 
-    private static final String NACOS_SERVER_ADDR = "192.168.31.56:8848";
+    private String serverAddr = "192.168.31.56:8848";
+    /**
+     * Nacos命名空间
+     */
+    private String namespace = "public";
+
+    /**
+     * Nacos分组
+     */
+    private String group = "DEFAULT_GROUP";
+
+    /**
+     * Nacos用户名
+     */
+    private String username;
+
+    /**
+     * Nacos密码
+     */
+    private String password;
+
     private final NamingService namingService;
 
     public NacosServiceRegistry() {
         try {
-            this.namingService = NamingFactory.createNamingService(NACOS_SERVER_ADDR);
+            Properties properties = new Properties();
+            properties.put("serverAddr", serverAddr);
+            properties.put("namespace", namespace);
+            properties.put("group", group);
+            properties.put("username", username);
+            properties.put("password", password);
+            this.namingService = NamingFactory.createNamingService(properties);
         } catch (NacosException e) {
             throw new RuntimeException(e);
         }

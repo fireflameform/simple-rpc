@@ -7,13 +7,13 @@ import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
-import lombok.Setter;
+import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 
 import java.net.InetSocketAddress;
 
 @Slf4j
-@Setter
+@Data
 public class RpcServer {
 
     private String host = "127.0.0.1";
@@ -25,7 +25,11 @@ public class RpcServer {
     private static final LocalServiceManager manager = new LocalServiceManager();
 
     public RpcServer() {
-        registry = new NacosServiceRegistry();
+        this(new NacosServiceRegistry());
+    }
+
+    public RpcServer(ServiceRegistry registry) {
+        this.registry = registry;
     }
 
 
@@ -38,7 +42,7 @@ public class RpcServer {
             ChannelFuture startFuture = serverBootstrap.group(bossGroup, workerGroup)
                     .channel(NioServerSocketChannel.class)
                     .childHandler(new RpcServerInitializer(manager))
-                    .bind("localhost", port)
+                    .bind(host, port)
                     .sync();
             log.info("netty服务器正常开启");
             startFuture.channel().closeFuture().sync();
@@ -55,7 +59,7 @@ public class RpcServer {
     public void register(String interfaceName, Object service) {
         //本地注册
         manager.register(interfaceName, service);
-        InetSocketAddress inetSocketAddress = new InetSocketAddress("localhost", port);
+        InetSocketAddress inetSocketAddress = new InetSocketAddress(host, port);
         //注册中心注册
         registry.registerService(interfaceName, inetSocketAddress);
     }

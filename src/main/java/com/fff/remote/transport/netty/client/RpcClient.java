@@ -17,12 +17,14 @@ import io.netty.channel.socket.nio.NioSocketChannel;
 import io.netty.handler.timeout.IdleStateHandler;
 import io.netty.util.concurrent.DefaultPromise;
 import io.netty.util.concurrent.Promise;
+import lombok.Data;
 
 import java.net.InetSocketAddress;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 
+@Data
 public class RpcClient implements RpcRequestTransport {
     private final Bootstrap bootstrap;
     private final ClientConnectionManager connectionManager;
@@ -30,20 +32,26 @@ public class RpcClient implements RpcRequestTransport {
     private final Map<String, Promise<RpcResponse<?>>> promiseMap;
     private final ServiceDiscovery serviceDiscovery;
 
-    private static final int TIME_OUT = 5000;
+    private int connectTimeOut = 5000;
+
+    private int invokeTimeOut = 5000;
 
     public RpcClient() {
+        this(new NacosServiceDiscovery());
+    }
+
+    public RpcClient(ServiceDiscovery serviceDiscovery) {
         bootstrap = new Bootstrap();
         connectionManager = new ClientConnectionManager();
         promiseMap = new ConcurrentHashMap<>();
         rpcResponseHandler = new RpcResponseHandler(promiseMap);
-        serviceDiscovery = new NacosServiceDiscovery();
+        this.serviceDiscovery = serviceDiscovery;
         EventLoopGroup group = new NioEventLoopGroup();
         bootstrap.group(group)
                 .channel(NioSocketChannel.class)
                 .option(ChannelOption.TCP_NODELAY, true)
                 .option(ChannelOption.SO_KEEPALIVE, true)
-                .option(ChannelOption.CONNECT_TIMEOUT_MILLIS, TIME_OUT)
+                .option(ChannelOption.CONNECT_TIMEOUT_MILLIS, connectTimeOut)
                 .handler(new ChannelInitializer<SocketChannel>() {
                     @Override
                     protected void initChannel(SocketChannel socketChannel) {
@@ -85,7 +93,7 @@ public class RpcClient implements RpcRequestTransport {
         promiseMap.put(rpcRequest.getRequestId(), promise);
         channel.writeAndFlush(rpcRequest);
         try {
-            return promise.get(5, TimeUnit.SECONDS);
+            return promise.get(invokeTimeOut, TimeUnit.MILLISECONDS);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }

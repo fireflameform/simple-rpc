@@ -1,6 +1,7 @@
 package com.fff.springConfig;
 
 
+import com.fff.remote.enums.RoleEnum;
 import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
@@ -16,20 +17,22 @@ public class RpcProperties {
 
     private SerializerConfig serializer = new SerializerConfig();
 
+    private RoleEnum role;
+
     @Data
-    private static class ServerConfig {
+    public static class ServerConfig {
         private String host = "127.0.0.1";
         private int port = 9999;
     }
 
     @Data
-    private static class ClientConfig {
-        private String host = "127.0.0.1";
-        private int port = 9999;
+    public static class ClientConfig {
+        private int connectTimeout = 5000;
+        private int invokeTimeout = 5000;
     }
 
     @Data
-    private static class RegistryConfig {
+    public static class RegistryConfig {
         private String type = "nacos";
 
         private NacosConfig nacos = new NacosConfig();
@@ -37,7 +40,7 @@ public class RpcProperties {
     }
 
     @Data
-    private static class NacosConfig {
+    public static class NacosConfig {
         private String serverAddr = "127.0.0.1:8848";
         /**
          * Nacos命名空间
@@ -61,7 +64,7 @@ public class RpcProperties {
     }
 
     @Data
-    private static class SerializerConfig {
+    public static class SerializerConfig {
         private String type = "kryo";
 
     }

@@ -2,7 +2,7 @@
 nacos:
   # 配置中心服务器地址
   config:
-    server-addr: ${rpc.nacos.server-addr:localhost:8848}
+    server-addr: ${rpc.nacos.server-serverAddr:localhost:8848}
     namespace: ${rpc.nacos.namespace:}
     group: ${rpc.nacos.group:DEFAULT_GROUP}
     username: ${rpc.nacos.username:}
@@ -20,7 +20,7 @@ nacos:
 
   # 服务发现配置
   discovery:
-    server-addr: ${rpc.nacos.server-addr:localhost:8848}
+    server-addr: ${rpc.nacos.server-serverAddr:localhost:8848}
     namespace: ${rpc.nacos.namespace:}
     group: ${rpc.nacos.group:DEFAULT_GROUP}
     cluster-name: ${rpc.nacos.cluster-name:}
