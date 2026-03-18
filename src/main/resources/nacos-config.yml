@@ -1,0 +1,106 @@
+# Nacos配置中心配置
+nacos:
+  # 配置中心服务器地址
+  config:
+    server-addr: ${rpc.nacos.server-addr:localhost:8848}
+    namespace: ${rpc.nacos.namespace:}
+    group: ${rpc.nacos.group:DEFAULT_GROUP}
+    username: ${rpc.nacos.username:}
+    password: ${rpc.nacos.password:}
+    # 配置刷新间隔（毫秒）
+    refresh-interval: 3000
+    # 配置超时时间（毫秒）
+    timeout: 3000
+    # 长轮询超时时间（毫秒）
+    long-poll-timeout: 30000
+    # 配置数据ID（多个用逗号分隔）
+    data-ids: 
+    # 配置扩展名（properties/yaml）
+    file-extension: yaml
+
+  # 服务发现配置
+  discovery:
+    server-addr: ${rpc.nacos.server-addr:localhost:8848}
+    namespace: ${rpc.nacos.namespace:}
+    group: ${rpc.nacos.group:DEFAULT_GROUP}
+    cluster-name: ${rpc.nacos.cluster-name:}
+    username: ${rpc.nacos.username:}
+    password: ${rpc.nacos.password:}
+    
+    # 服务注册配置
+    service:
+      # 服务名称（自动从应用名获取）
+      name: 
+      # 服务IP（自动获取）
+      ip: 
+      # 服务端口
+      port: ${rpc.server.port:8080}
+      # 服务权重
+      weight: ${rpc.server.weight:1.0}
+      # 是否启用
+      enabled: ${rpc.server.enabled:true}
+      # 健康检查URL
+      health-check-url: 
+      # 健康检查间隔（秒）
+      health-check-interval: ${rpc.server.health-check-interval:30}
+      # 健康检查超时时间（秒）
+      health-check-timeout: 10
+      # 实例心跳间隔（秒）
+      instance-heartbeat-interval: 5
+      # 实例心跳超时时间（秒）
+      instance-heartbeat-timeout: 15
+      # 实例删除超时时间（秒）
+      instance-ip-delete-timeout: 30
+      
+    # 元数据配置
+    metadata:
+      version: 1.0.0
+      environment: development
+      region: default
+      zone: default
+      
+    # 订阅服务配置
+    subscribed-services: 
+    # 是否订阅所有服务
+    subscribe-all-services: false
+    # 服务更新延迟时间（毫秒）
+    naming-load-cache-at-start: false
+    # 命名空间刷新间隔（秒）
+    naming-client-beat-thread-count: 1
+    # 命名空间轮询间隔（秒）
+    naming-polling-thread-count: 1
+
+  # 日志配置
+  logging:
+    # Nacos客户端日志级别
+    level: INFO
+    # 是否启用Nacos日志
+    enabled: true
+
+# RPC服务配置（通过Nacos配置中心管理）
+rpc-services:
+  # 用户服务配置
+  user-service:
+    # 服务接口全限定名
+    interface: com.fff.example.UserService
+    # 服务版本
+    version: 1.0.0
+    # 服务分组
+    group: user-group
+    # 负载均衡策略
+    load-balance: random
+    # 超时时间（毫秒）
+    timeout: 5000
+    # 重试次数
+    retry-count: 3
+    # 熔断器配置
+    circuit-breaker:
+      enabled: true
+      # 失败率阈值（百分比）
+      failure-rate-threshold: 50
+      # 滑动窗口大小
+      sliding-window-size: 10
+      # 最小调用次数
+      minimum-number-of-calls: 5
+      # 熔断持续时间（秒）
+      wait-duration-in-open-state: 60

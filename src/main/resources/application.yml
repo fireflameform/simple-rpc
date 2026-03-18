@@ -1,0 +1,58 @@
+# RPC框架配置
+rpc:
+  # Nacos注册中心配置
+  nacos:
+    # Nacos服务器地址
+    server-addr: localhost:8848
+    # 命名空间（可选）
+    namespace: 
+    # 分组（可选，默认DEFAULT_GROUP）
+    group: DEFAULT_GROUP
+    # 集群名称（可选）
+    cluster-name: 
+    # 用户名（如果Nacos开启认证）
+    username: 
+    # 密码（如果Nacos开启认证）
+    password: 
+  
+  # 服务端配置
+  server:
+    # 服务端口
+    port: 8080
+    # 服务权重（负载均衡使用）
+    weight: 1.0
+    # 是否启用服务
+    enabled: true
+    # 服务健康检查间隔（秒）
+    health-check-interval: 30
+  
+  # 客户端配置
+  client:
+    # 连接超时时间（毫秒）
+    connect-timeout: 3000
+    # 请求超时时间（毫秒）
+    request-timeout: 5000
+    # 重试次数
+    retry-count: 3
+    # 负载均衡策略（random/round-robin/least-active）
+    load-balance: random
+  
+  # 序列化配置
+  serialize:
+    # 序列化方式（kryo/json/hessian/protostuff）
+    type: kryo
+    # 压缩方式（可选：gzip/snappy/none）
+    compress: none
+  
+  # 网络配置
+  netty:
+    # Boss线程数
+    boss-threads: 1
+    # Worker线程数
+    worker-threads: 8
+    # 最大连接数
+    max-connections: 1000
+    # 心跳间隔（秒）
+    heartbeat-interval: 30
+    # 心跳超时时间（秒）
+    heartbeat-timeout: 90
