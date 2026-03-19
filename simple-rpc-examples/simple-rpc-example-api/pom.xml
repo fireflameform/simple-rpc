@@ -20,15 +20,13 @@
 
     <dependencies>
         <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
-            <version>3.8.1</version>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter-engine</artifactId>
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>org.openrewrite.tools</groupId>
+            <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
-            <version>1.18.37</version>
         </dependency>
     </dependencies>
 </project>
