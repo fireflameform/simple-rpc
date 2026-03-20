@@ -22,6 +22,10 @@ public class RpcServer {
 
     private final ServiceRegistry registry;
 
+    private NioEventLoopGroup bossGroup = new NioEventLoopGroup();
+
+    private NioEventLoopGroup workerGroup = new NioEventLoopGroup();
+
     private static final LocalServiceManager manager = new LocalServiceManager();
 
     public RpcServer() {
@@ -36,8 +40,8 @@ public class RpcServer {
     public void start() {
         //启动一个netty服务器，监听并处理消息
         ServerBootstrap serverBootstrap = new ServerBootstrap();
-        NioEventLoopGroup bossGroup = new NioEventLoopGroup(1);
-        NioEventLoopGroup workerGroup = new NioEventLoopGroup();
+        bossGroup = new NioEventLoopGroup(1);
+        workerGroup = new NioEventLoopGroup();
         try {
             ChannelFuture startFuture = serverBootstrap.group(bossGroup, workerGroup)
                     .channel(NioServerSocketChannel.class)
@@ -54,6 +58,11 @@ public class RpcServer {
             workerGroup.shutdownGracefully();
             log.info("关闭eventLoop");
         }
+    }
+
+    public void close() {
+        bossGroup.shutdownGracefully();
+        workerGroup.shutdownGracefully();
     }
 
     public void register(String interfaceName, Object service) {

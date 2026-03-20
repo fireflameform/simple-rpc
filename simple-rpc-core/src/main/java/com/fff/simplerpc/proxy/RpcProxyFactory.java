@@ -4,6 +4,7 @@ import com.fff.simplerpc.protocol.dto.RpcRequest;
 import com.fff.simplerpc.protocol.dto.RpcResponse;
 import com.fff.simplerpc.protocol.enums.CodeEnum;
 import com.fff.simplerpc.transport.RpcRequestTransport;
+import com.fff.simplerpc.transport.netty.client.RpcClient;
 
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
@@ -15,6 +16,10 @@ public class RpcProxyFactory {
     private final RpcRequestTransport rpcClient;
     public RpcProxyFactory(RpcRequestTransport rpcClient) {
         this.rpcClient = rpcClient;
+    }
+
+    public RpcProxyFactory() {
+        this(new RpcClient());
     }
 
     @SuppressWarnings("unchecked")

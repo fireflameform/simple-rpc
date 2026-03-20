@@ -1,0 +1,2 @@
+com.fff.simplerpc.springboot.autoconfigure.RpcClientAutoConfiguration
+com.fff.simplerpc.springboot.autoconfigure.RpcServerAutoConfiguration

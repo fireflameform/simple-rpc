@@ -3,8 +3,10 @@ package com.fff.simplerpc.springboot.autoconfigure;
 import com.fff.simplerpc.registry.ServiceRegistry;
 import com.fff.simplerpc.registry.nacos.NacosServiceRegistry;
 import com.fff.simplerpc.springboot.properties.RpcProperties;
+import com.fff.simplerpc.springboot.starter.RpcServerStarter;
 import com.fff.simplerpc.transport.netty.server.RpcServer;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -12,6 +14,10 @@ import org.springframework.context.annotation.Configuration;
 @EnableConfigurationProperties(RpcProperties.class)
 @ConditionalOnClass(RpcServer.class)
 @Configuration
+@ConditionalOnExpression(
+        "'${rpc.role}'.equalsIgnoreCase('server') " +
+                "or '${rpc.role}'.equalsIgnoreCase('both')"
+)
 public class RpcServerAutoConfiguration {
 
     @Bean
@@ -34,6 +40,11 @@ public class RpcServerAutoConfiguration {
         rpcServer.setPort(server.getPort());
         rpcServer.setHost(server.getHost());
         return rpcServer;
+    }
+
+    @Bean
+    public RpcServerStarter rpcServerStarter(RpcServer rpcServer) {
+        return new RpcServerStarter(rpcServer);
     }
 
 }

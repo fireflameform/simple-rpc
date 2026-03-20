@@ -11,9 +11,9 @@
       <module>simple-rpc-core</module>
       <module>simple-rpc-spring-boot-starter</module>
       <module>simple-rpc-examples</module>
-      <module>simple-rpc-examples/simple-rpc-example-provider</module>
-      <module>simple-rpc-examples/simple-rpc-example-consumer</module>
-      <module>simple-rpc-examples/simple-rpc-example-api</module>
+      <module>simple-rpc-examples/example-provider</module>
+      <module>simple-rpc-examples/example-consumer</module>
+      <module>simple-rpc-examples/example-api</module>
     </modules>
     <version>1.0-SNAPSHOT</version>
 

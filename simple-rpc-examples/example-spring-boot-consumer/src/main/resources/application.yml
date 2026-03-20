@@ -1,0 +1,5 @@
+rpc:
+  role: client
+  registry:
+    nacos:
+      server-addr: 192.168.0.105:8848

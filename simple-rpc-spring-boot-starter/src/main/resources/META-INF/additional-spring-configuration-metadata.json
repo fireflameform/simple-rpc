@@ -1,0 +1,16 @@
+{
+  "properties": [
+    {
+      "name": "rpc.server.port",
+      "type": "java.lang.Integer",
+      "description": "RPC服务端端口号",
+      "defaultValue": 9999
+    },
+    {
+      "name": "rpc.client.timeout",
+      "type": "java.lang.Long",
+      "description": "RPC客户端超时时间(毫秒)",
+      "defaultValue": 5000
+    }
+  ]
+}
