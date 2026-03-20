@@ -47,4 +47,9 @@ public class RpcServerAutoConfiguration {
         return new RpcServerStarter(rpcServer);
     }
 
+    @Bean
+    public RpcServerProcessor rpcServerProcessor(RpcServer rpcServer) {
+        return new RpcServerProcessor(rpcServer);
+    }
+
 }
