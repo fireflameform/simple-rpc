@@ -4,7 +4,8 @@ import com.fff.simplerpc.registry.ServiceRegistry;
 import com.fff.simplerpc.registry.nacos.NacosServiceRegistry;
 import com.fff.simplerpc.springboot.properties.RpcProperties;
 import com.fff.simplerpc.springboot.starter.RpcServerStarter;
-import com.fff.simplerpc.transport.netty.server.RpcServer;
+import com.fff.simplerpc.transport.api.RpcServer;
+import com.fff.simplerpc.transport.netty.server.NettyRpcServer;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
@@ -12,10 +13,10 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 @EnableConfigurationProperties(RpcProperties.class)
-@ConditionalOnClass(RpcServer.class)
+@ConditionalOnClass(NettyRpcServer.class)
 @Configuration
 @ConditionalOnExpression(
-        "'${rpc.role}'.equalsIgnoreCase('server') " +
+        "'${rpc.role}'.equalsIgnoreCase('provider') " +
                 "or '${rpc.role}'.equalsIgnoreCase('both')"
 )
 public class RpcServerAutoConfiguration {
@@ -35,7 +36,9 @@ public class RpcServerAutoConfiguration {
     //注入服务器
     @Bean
     public RpcServer rpcServer(RpcProperties rpcProperties, ServiceRegistry serviceRegistry) {
-        RpcServer rpcServer = new RpcServer(serviceRegistry);
+        //由于项目只实现了以netty作为通信框架的模式，就直接初始化nettyRpcServer了，
+        // 否则应该根据properties配置来选择初始化
+        NettyRpcServer rpcServer = new NettyRpcServer(serviceRegistry);
         RpcProperties.ServerConfig server = rpcProperties.getServer();
         rpcServer.setPort(server.getPort());
         rpcServer.setHost(server.getHost());

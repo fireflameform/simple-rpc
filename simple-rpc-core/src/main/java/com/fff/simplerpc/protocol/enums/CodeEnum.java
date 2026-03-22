@@ -1,6 +1,5 @@
 package com.fff.simplerpc.protocol.enums;
 
-
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 

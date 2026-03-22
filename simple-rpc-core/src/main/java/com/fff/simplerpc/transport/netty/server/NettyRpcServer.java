@@ -2,9 +2,11 @@ package com.fff.simplerpc.transport.netty.server;
 
 import com.fff.simplerpc.registry.ServiceRegistry;
 import com.fff.simplerpc.registry.nacos.NacosServiceRegistry;
+import com.fff.simplerpc.transport.api.RpcServer;
 import com.fff.simplerpc.util.LocalServiceManager;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.ChannelFuture;
+import io.netty.channel.ChannelOption;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
 import lombok.Data;
@@ -14,7 +16,7 @@ import java.net.InetSocketAddress;
 
 @Slf4j
 @Data
-public class RpcServer {
+public class NettyRpcServer implements RpcServer {
 
     private String host = "127.0.0.1";
 
@@ -28,15 +30,15 @@ public class RpcServer {
 
     private static final LocalServiceManager manager = new LocalServiceManager();
 
-    public RpcServer() {
+    public NettyRpcServer() {
         this(new NacosServiceRegistry());
     }
 
-    public RpcServer(ServiceRegistry registry) {
+    public NettyRpcServer(ServiceRegistry registry) {
         this.registry = registry;
     }
 
-
+    @Override
     public void start() {
         //启动一个netty服务器，监听并处理消息
         ServerBootstrap serverBootstrap = new ServerBootstrap();
@@ -45,6 +47,8 @@ public class RpcServer {
         try {
             ChannelFuture startFuture = serverBootstrap.group(bossGroup, workerGroup)
                     .channel(NioServerSocketChannel.class)
+                    .option(ChannelOption.TCP_NODELAY, true)
+                    .option(ChannelOption.SO_KEEPALIVE, true)
                     .childHandler(new RpcServerInitializer(manager))
                     .bind(host, port)
                     .sync();
@@ -60,11 +64,13 @@ public class RpcServer {
         }
     }
 
+    @Override
     public void close() {
         bossGroup.shutdownGracefully();
         workerGroup.shutdownGracefully();
     }
 
+    @Override
     public void register(String interfaceName, Object service) {
         //本地注册
         manager.register(interfaceName, service);

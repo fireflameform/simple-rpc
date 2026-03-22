@@ -3,8 +3,8 @@ package com.fff.simplerpc.proxy;
 import com.fff.simplerpc.protocol.dto.RpcRequest;
 import com.fff.simplerpc.protocol.dto.RpcResponse;
 import com.fff.simplerpc.protocol.enums.CodeEnum;
-import com.fff.simplerpc.transport.RpcRequestTransport;
-import com.fff.simplerpc.transport.netty.client.RpcClient;
+import com.fff.simplerpc.transport.api.RpcClient;
+import com.fff.simplerpc.transport.netty.client.NettyRpcClient;
 
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
@@ -13,13 +13,13 @@ import java.util.UUID;
 
 public class RpcProxyFactory {
 
-    private final RpcRequestTransport rpcClient;
-    public RpcProxyFactory(RpcRequestTransport rpcClient) {
+    private final RpcClient rpcClient;
+    public RpcProxyFactory(RpcClient rpcClient) {
         this.rpcClient = rpcClient;
     }
 
     public RpcProxyFactory() {
-        this(new RpcClient());
+        this(new NettyRpcClient());
     }
 
     @SuppressWarnings("unchecked")

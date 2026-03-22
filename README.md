@@ -1,76 +1,77 @@
 # Simple RPC Framework
 
-一个基于Netty的高性能、轻量级RPC框架，支持服务注册发现和配置管理。
+一个基于Netty的高性能、轻量级RPC框架，支持服务注册发现和Spring Boot自动配置。
 
 ## 🏗️ 项目结构
 
 ```
 simpleRPC/
-├── .idea/                          # IDE配置文件
-│   ├── .gitignore
-│   ├── ApifoxUploaderProjectSetting.xml
-│   ├── encodings.xml
-│   ├── misc.xml
-│   ├── uiDesigner.xml
-│   └── vcs.xml
-├── src/
-│   └── main/
-│       ├── java/
-│       │   └── com/
-│       │       └── fff/
-│       │           ├── registry/                  # 服务注册发现模块
-│       │           │   ├── nacos/
-│       │           │   │   ├── NacosServiceDiscovery.java
-│       │           │   │   └── NacosServiceRegistry.java
-│       │           │   ├── ServiceDiscovery.java
-│       │           │   └── ServiceRegistry.java
-│       │           ├── remote/                    # RPC核心模块
-│       │           │   ├── dto/                   # 数据传输对象
-│       │           │   │   ├── RpcRequest.java
-│       │           │   │   └── RpcResponse.java
-│       │           │   ├── enums/                 # 枚举定义
-│       │           │   │   ├── CodeEnum.java
-│       │           │   │   ├── MessageTagEnum.java
-│       │           │   │   └── RoleEnum.java
-│       │           │   ├── serialize/             # 序列化模块
-│       │           │   │   ├── JsonSerializer.java
-│       │           │   │   ├── KryoSerializer.java
-│       │           │   │   └── Serializer.java
-│       │           │   └── transport/             # 网络传输模块
-│       │           │       ├── netty/
-│       │           │       │   ├── client/        # 客户端实现
-│       │           │       │   │   ├── RpcClient.java
-│       │           │       │   │   ├── RpcProxyFactory.java
-│       │           │       │   │   └── RpcResponseHandler.java
-│       │           │       │   ├── codec/         # 编解码器
-│       │           │       │   │   ├── RpcCodec.java
-│       │           │       │   │   ├── RpcMessageDecoder.java
-│       │           │       │   │   └── RpcMessageEncoder.java
-│       │           │       │   ├── handler/       # 处理器
-│       │           │       │   │   └── RpcRequestHandler.java
-│       │           │       │   └── server/        # 服务端实现
-│       │           │       │       ├── RpcServer.java
-│       │           │       │       └── RpcServerInitializer.java
-│       │           │       └── RpcRequestTransport.java
-│       │           ├── springConfig/              # Spring配置模块
-│       │           │   ├── RpcClientAutoConfiguration.java
-│       │           │   ├── RpcProperties.java
-│       │           │   └── RpcServerAutoConfiguration.java
-│       │           └── utils/                     # 工具类
-│       │               ├── ClientConnectionManager.java
-│       │               └── LocalServiceManager.java
-│       ├── testClient/                            # 客户端测试代码
-│       │   ├── Test.java
-│       │   ├── User.java
-│       │   └── UserService.java
-│       ├── testServer/                            # 服务端测试代码
-│       │   ├── Test.java
-│       │   └── UserServiceImpl.java
-│       └── resources/                             # 配置文件
-│           ├── application.yml
-│           └── nacos-config.yml
-├── .gitignore                                     # Git忽略文件
-└── pom.xml                                        # Maven配置文件
+├── simple-rpc-core/                          # RPC核心模块
+│   ├── src/main/java/com/fff/simplerpc/
+│   │   ├── protocol/                         # 协议层
+│   │   │   ├── dto/                          # 数据传输对象
+│   │   │   │   ├── RpcRequest.java
+│   │   │   │   └── RpcResponse.java
+│   │   │   ├── enums/                        # 枚举定义
+│   │   │   │   ├── CodeEnum.java
+│   │   │   │   ├── MessageTagEnum.java
+│   │   │   │   └── RoleEnum.java
+│   │   │   └── serialize/                    # 序列化模块
+│   │   │       ├── JsonSerializer.java
+│   │   │       ├── KryoSerializer.java
+│   │   │       └── Serializer.java
+│   │   ├── proxy/                            # 代理层
+│   │   │   └── RpcProxyFactory.java
+│   │   ├── registry/                         # 注册中心
+│   │   │   ├── nacos/
+│   │   │   │   ├── NacosServiceDiscovery.java
+│   │   │   │   └── NacosServiceRegistry.java
+│   │   │   ├── ServiceDiscovery.java
+│   │   │   └── ServiceRegistry.java
+│   │   ├── transport/                        # 传输层
+│   │   │   └── RpcRequestTransport.java
+│   │   └── util/                             # 工具类
+│   │       ├── ClientConnectionManager.java
+│   │       └── LocalServiceManager.java
+│   └── pom.xml
+├── simple-rpc-spring-boot-starter/           # Spring Boot Starter
+│   ├── src/main/java/com/fff/simplerpc/springboot/
+│   │   ├── annotation/                       # 注解定义
+│   │   │   └── RpcService.java
+│   │   ├── autoconfigure/                    # 自动配置
+│   │   │   ├── RpcClientAutoConfiguration.java
+│   │   │   ├── RpcServerAutoConfiguration.java
+│   │   │   └── RpcServerProcessor.java
+│   │   ├── properties/                       # 配置属性
+│   │   │   └── RpcProperties.java
+│   │   └── starter/                          # 启动器
+│   │       └── RpcServerStarter.java
+│   ├── src/main/resources/META-INF/
+│   │   ├── spring/org.springframework.boot.autoconfigure.AutoConfiguration.imports
+│   │   └── additional-spring-configuration-metadata.json
+│   └── pom.xml
+├── simple-rpc-examples/                      # 示例模块
+│   ├── example-api/                          # API定义模块
+│   │   ├── src/main/java/com/fff/example/api/
+│   │   │   └── UserService.java
+│   │   └── pom.xml
+│   ├── example-consumer/                     # 消费者示例（非Spring Boot）
+│   │   ├── src/main/java/com/fff/example/consumer/
+│   │   │   └── Test.java
+│   │   └── pom.xml
+│   ├── example-provider/                     # 提供者示例（非Spring Boot）
+│   │   ├── src/main/java/com/fff/example/provider/
+│   │   │   └── Test.java
+│   │   └── pom.xml
+│   ├── example-spring-boot-consumer/         # Spring Boot消费者示例
+│   │   ├── src/main/resources/application.yml
+│   │   └── pom.xml
+│   ├── example-spring-boot-provider/         # Spring Boot提供者示例
+│   │   ├── src/main/resources/application.yml
+│   │   └── pom.xml
+│   └── pom.xml
+├── .gitignore
+└── pom.xml                                   # 父项目POM
 ```
 
 ## 📋 技术栈
@@ -78,7 +79,7 @@ simpleRPC/
 ### 核心框架
 - **Java 8** - 基础开发语言
 - **Netty 4.1.42.Final** - 高性能网络通信框架
-- **Spring 5.2.7.RELEASE** - 配置管理和依赖注入
+- **Spring Boot 2.7.18** - 自动配置和依赖管理
 
 ### 服务注册与发现
 - **Nacos 2.2.3** - 服务注册中心和配置中心
@@ -102,30 +103,77 @@ simpleRPC/
 - Nacos Server 2.0+
 
 ### 2. 配置Nacos
-修改 `src/main/resources/application.yml` 中的Nacos配置：
+修改示例模块中的`application.yml`：
 
 ```yaml
+spring:
+  application:
+    name: provider
+
 rpc:
-  nacos:
-    server-addr: localhost:8848
-    namespace: 
-    group: DEFAULT_GROUP
+  server:
+    port: 9999
+    host: 127.0.0.1
+  registry:
+    nacos:
+      server-addr: localhost:8848
+      namespace: public
+      group: DEFAULT_GROUP
+      username: nacos
+      password: nacos
 ```
 
-### 3. 启动服务端
+### 3. Spring Boot方式启动
+
+#### 服务提供者
 ```java
-// 创建RPC服务器
-RpcServer server = new RpcServer(8080);
+@RpcService
+public class UserServiceImpl implements UserService {
+    @Override
+    public User getUserInfo(String name) {
+        return new User(name, 18);
+    }
+}
 ```
 
-### 4. 客户端调用
+#### 服务消费者
 ```java
-// 创建RPC客户端
-RpcClient client = new RpcClient("localhost:8848");
-UserService userService = client.createProxy(UserService.class);
+public class Test {
+    @Autowired
+    private RpcProxyFactory rpcProxyFactory;
 
-// 像调用本地方法一样调用远程服务
-User user = userService.getUserById(1L);
+    @Test
+    public void testUserService() {
+        UserService userService = rpcProxyFactory.createProxy(UserService.class);
+        User user = userService.getUserInfo("test");
+        System.out.println(user);
+    }
+}
+```
+
+### 4. 传统方式启动
+
+#### 服务提供者
+```java
+public class Test {
+    public static void main(String[] args) {
+        RpcServer rpcServer = new RpcServer();
+        rpcServer.register("UserService", new UserServiceImpl());
+        rpcServer.start();
+    }
+}
+```
+
+#### 服务消费者
+```java
+public class Test {
+    public static void main(String[] args) {
+        RpcProxyFactory rpcProxyFactory = new RpcProxyFactory();
+        UserService userService = rpcProxyFactory.createProxy(UserService.class);
+        User user = userService.getUserInfo("test");
+        System.out.println(user);
+    }
+}
 ```
 
 ## 🔧 核心特性
@@ -140,24 +188,15 @@ User user = userService.getUserById(1L);
 - 支持服务分组和版本控制
 - 内置负载均衡策略
 
-### 配置管理
-- YAML配置文件支持
-- Spring配置属性绑定
-- 多环境配置支持
+### Spring Boot集成
+- 自动配置和条件装配
+- 配置属性绑定和验证
+- Starter方式快速集成
 
 ### 序列化支持
 - 可插拔的序列化策略
 - 支持Kryo（高性能）和JSON（可读性）
 - 消息头包含序列化协议标识
-
-## 📊 架构设计
-
-### 分层架构
-1. **传输层**：基于Netty的网络通信
-2. **序列化层**：支持多种序列化协议
-3. **代理层**：动态代理实现透明调用
-4. **注册中心**：服务注册与发现
-5. **配置层**：统一配置管理
 
 ### 消息协议
 ```
@@ -165,14 +204,6 @@ User user = userService.getUserById(1L);
 | 消息类型(1字节) | 序列化协议(1字节) | 数据长度(4字节) |   数据内容(N字节)  |
 +----------------+----------------+----------------+----------------+
 ```
-
-## 🔍 扩展性
-
-框架设计具有良好的扩展性，支持：
-- 自定义序列化协议
-- 自定义负载均衡策略
-- 自定义服务发现机制
-- 自定义配置源
 
 ## 📝 许可证
 

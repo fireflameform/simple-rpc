@@ -1,7 +1,8 @@
 package com.fff.simplerpc.springboot.autoconfigure;
 
 import com.fff.simplerpc.springboot.annotation.RpcService;
-import com.fff.simplerpc.transport.netty.server.RpcServer;
+import com.fff.simplerpc.transport.api.RpcServer;
+import com.fff.simplerpc.transport.netty.server.NettyRpcServer;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeansException;

@@ -6,7 +6,7 @@ import lombok.Getter;
 @AllArgsConstructor
 @Getter
 public enum RoleEnum {
-    SERVER(),
-    CLIENT(),
+    PROVIDER(),
+    CONSUMER(),
     BOTH()
 }

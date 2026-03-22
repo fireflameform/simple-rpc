@@ -6,7 +6,7 @@ import com.fff.simplerpc.protocol.dto.RpcResponse;
 import com.fff.simplerpc.protocol.serialize.KryoSerializer;
 import com.fff.simplerpc.registry.ServiceDiscovery;
 import com.fff.simplerpc.registry.nacos.NacosServiceDiscovery;
-import com.fff.simplerpc.transport.RpcRequestTransport;
+import com.fff.simplerpc.transport.api.RpcClient;
 import com.fff.simplerpc.transport.netty.codec.RpcCodec;
 import com.fff.simplerpc.util.ClientConnectionManager;
 import io.netty.bootstrap.Bootstrap;
@@ -25,7 +25,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 
 @Data
-public class RpcClient implements RpcRequestTransport {
+public class NettyRpcClient implements RpcClient {
     private final Bootstrap bootstrap;
     private final ClientConnectionManager connectionManager;
     private final RpcResponseHandler rpcResponseHandler;
@@ -36,11 +36,11 @@ public class RpcClient implements RpcRequestTransport {
 
     private int invokeTimeOut = 5000;
 
-    public RpcClient() {
+    public NettyRpcClient() {
         this(new NacosServiceDiscovery());
     }
 
-    public RpcClient(ServiceDiscovery serviceDiscovery) {
+    public NettyRpcClient(ServiceDiscovery serviceDiscovery) {
         bootstrap = new Bootstrap();
         connectionManager = new ClientConnectionManager();
         promiseMap = new ConcurrentHashMap<>();
