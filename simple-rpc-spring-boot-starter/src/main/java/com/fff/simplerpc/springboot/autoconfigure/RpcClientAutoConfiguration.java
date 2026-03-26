@@ -6,6 +6,7 @@ import com.fff.simplerpc.registry.ServiceDiscovery;
 import com.fff.simplerpc.registry.nacos.NacosServiceDiscovery;
 import com.fff.simplerpc.springboot.properties.RpcProperties;
 import com.fff.simplerpc.transport.netty.client.NettyRpcClient;
+import com.fff.simplerpc.util.ServiceCache;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
@@ -23,7 +24,6 @@ import org.springframework.context.annotation.Configuration;
 public class RpcClientAutoConfiguration {
 
     @Bean
-    @ConditionalOnMissingBean(NettyRpcClient.class)
     public NacosServiceDiscovery nacosServiceDiscovery(RpcProperties rpcProperties) {
         RpcProperties.NacosConfig nacos = rpcProperties.getRegistry().getNacos();
 
@@ -37,9 +37,13 @@ public class RpcClientAutoConfiguration {
     }
 
     @Bean
-    @ConditionalOnMissingBean(NettyRpcClient.class)
-    public NettyRpcClient rpcClient(RpcProperties rpcProperties, ServiceDiscovery serviceDiscovery) {
-        NettyRpcClient rpcClient = new NettyRpcClient(serviceDiscovery);
+    public ServiceCache serviceCache(RpcProperties rpcProperties, ServiceDiscovery serviceDiscovery) {
+        return new ServiceCache(serviceDiscovery);
+    }
+
+    @Bean
+    public NettyRpcClient rpcClient(RpcProperties rpcProperties, ServiceCache serviceCache) {
+        NettyRpcClient rpcClient = new NettyRpcClient(serviceCache);
         RpcProperties.ClientConfig client = rpcProperties.getClient();
         rpcClient.setConnectTimeOut(client.getConnectTimeout());
         rpcClient.setInvokeTimeOut(client.getInvokeTimeout());

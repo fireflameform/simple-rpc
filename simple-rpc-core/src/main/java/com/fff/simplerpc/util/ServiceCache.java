@@ -7,6 +7,7 @@ import com.fff.simplerpc.registry.nacos.NacosServiceDiscovery;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class ServiceCache {
@@ -14,29 +15,48 @@ public class ServiceCache {
 
     private final ServiceDiscovery serviceDiscovery;
 
+    private final Set<String> subscribedServices;
+
     public ServiceCache() {
+        this(new NacosServiceDiscovery());
+    }
+
+    public ServiceCache(ServiceDiscovery serviceDiscovery) {
         this.serviceCache = new ConcurrentHashMap<>();
-        this.serviceDiscovery = new NacosServiceDiscovery();
+        this.serviceDiscovery = serviceDiscovery;
+        this.subscribedServices = ConcurrentHashMap.newKeySet();
     }
 
-    //设置interfaceName对应的实例列表
-    public void getInstances(String interfaceName) throws NacosException {
-        List<Instance> instances = serviceDiscovery.lookupService(interfaceName);
-        serviceCache.put(interfaceName, instances);
-    }
-
-    //更新缓存（直接替换）
-    public void updateCache(String interfaceName, List<Instance> instances) throws NacosException {
-        serviceCache.put(interfaceName, instances);
-    }
-
-    //删除实例
-    public void deleteInstance(String interfaceName, Instance instance) throws NacosException {
-        List<Instance> instances = serviceCache.get(interfaceName);
-        if (instances != null) {
-            instances.remove(instance);
+    //获取实例列表
+    public List<Instance> getInstances(String serviceName) {
+        List<Instance> instances = serviceCache.get(serviceName);
+        if (instances == null) {
+            try {
+                instances = pullInstances(serviceName);
+                if (!subscribedServices.contains(serviceName)) {
+                    serviceDiscovery.subscribe(serviceName, (service) -> {
+                        try {
+                            pullInstances(serviceName);
+                        } catch (NacosException e) {
+                            throw new RuntimeException(e);
+                        }
+                    });
+                }
+            } catch (NacosException e) {
+                throw new RuntimeException(e);
+            }
         }
+        return instances;
     }
 
+    //从注册中心拉取并存入缓存
+    private List<Instance> pullInstances(String serviceName) throws NacosException {
+        List<Instance> instances = serviceDiscovery.lookupService(serviceName);
+        serviceCache.put(serviceName, instances);
+        return instances;
+    }
+
+
+    //TODO
     //定时同步（全量拉取）
 }

@@ -1,14 +1,13 @@
 package com.fff.simplerpc.transport.netty.client;
 
-import com.alibaba.nacos.api.exception.NacosException;
+import com.alibaba.nacos.api.naming.pojo.Instance;
 import com.fff.simplerpc.protocol.dto.RpcRequest;
 import com.fff.simplerpc.protocol.dto.RpcResponse;
 import com.fff.simplerpc.protocol.serialize.KryoSerializer;
-import com.fff.simplerpc.registry.ServiceDiscovery;
-import com.fff.simplerpc.registry.nacos.NacosServiceDiscovery;
 import com.fff.simplerpc.transport.api.RpcClient;
 import com.fff.simplerpc.transport.netty.codec.RpcCodec;
 import com.fff.simplerpc.util.ClientConnectionManager;
+import com.fff.simplerpc.util.ServiceCache;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.*;
 import io.netty.channel.nio.NioEventLoopGroup;
@@ -19,7 +18,7 @@ import io.netty.util.concurrent.DefaultPromise;
 import io.netty.util.concurrent.Promise;
 import lombok.Data;
 
-import java.net.InetSocketAddress;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
@@ -30,22 +29,22 @@ public class NettyRpcClient implements RpcClient {
     private final ClientConnectionManager connectionManager;
     private final RpcResponseHandler rpcResponseHandler;
     private final Map<String, Promise<RpcResponse<?>>> promiseMap;
-    private final ServiceDiscovery serviceDiscovery;
+    private final ServiceCache serviceCache;
 
     private int connectTimeOut = 5000;
 
     private int invokeTimeOut = 5000;
 
     public NettyRpcClient() {
-        this(new NacosServiceDiscovery());
+        this(new ServiceCache());
     }
 
-    public NettyRpcClient(ServiceDiscovery serviceDiscovery) {
+    public NettyRpcClient(ServiceCache serviceCache) {
         bootstrap = new Bootstrap();
         connectionManager = new ClientConnectionManager();
         promiseMap = new ConcurrentHashMap<>();
         rpcResponseHandler = new RpcResponseHandler(promiseMap);
-        this.serviceDiscovery = serviceDiscovery;
+        this.serviceCache = serviceCache;
         EventLoopGroup group = new NioEventLoopGroup();
         bootstrap.group(group)
                 .channel(NioSocketChannel.class)
@@ -75,18 +74,20 @@ public class NettyRpcClient implements RpcClient {
     @Override
     public Object sendRPCRequest(RpcRequest rpcRequest) {
         // 如果有连接，就直接发请求，如果没有连接则建立连接
-        InetSocketAddress address;
+        Instance address;
 
         System.out.println("寻找服务，服务名称" + rpcRequest.getInterfaceName());
         //通过注册中心寻找服务
-        try {
-            address = serviceDiscovery.lookupService(rpcRequest.getInterfaceName());
-        } catch (NacosException e) {
-            throw new RuntimeException(e);
+        List<Instance> instances = serviceCache.getInstances(rpcRequest.getInterfaceName());
+        if (instances == null || instances.isEmpty()) {
+            throw new RuntimeException("服务列表为空");
         }
+        //TODO 这里可以做负载均衡
+        address = instances.get(0);
+
         System.out.println("找到服务" + address);
         //获取对应channel
-        Channel channel = getChannel(address.getHostName(), address.getPort());
+        Channel channel = getChannel(address.getIp(), address.getPort());
         //使用promise接收结果
         DefaultPromise<RpcResponse<?>> promise = new DefaultPromise<>(channel.eventLoop());
         //将promise暂存入map，当结果返回时，将promise取出并标记为成功，即可取得结果
